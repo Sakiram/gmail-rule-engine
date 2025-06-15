@@ -1,0 +1,24 @@
+{
+  "predicate": "all",
+  "rules": [
+    {
+      "field": "from",
+      "predicate": "contains",
+      "value": "krithika_k"
+    },
+    {
+      "field": "to",
+      "predicate": "contains",
+      "value": "sakiram"
+    },
+    {
+      "field": "date_received",
+      "predicate": "less_than_days",
+      "value": 1
+    }
+  ],
+  "actions": [
+    "mark_as_read",
+    "move_to_label:CATEGORY_social"
+  ]
+}

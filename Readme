@@ -1,0 +1,196 @@
+# Gmail Rule Engine
+
+A Python-based automation engine that fetches emails from Gmail, stores them in PostgreSQL, and applies user-defined rules (e.g., mark as read, move to label).
+
+---
+
+## Features
+
+* Fetch Gmail messages using OAuth 2.0
+* Store emails in a PostgreSQL database
+* Define rules in JSON (by sender, subject, content, etc.)
+* Perform actions like mark as read/unread, move to label
+* Multiple user support with token-based authentication
+
+---
+
+## Requirements
+
+* Python 3.8+
+* PostgreSQL 12+
+* Google Cloud Project with Gmail API enabled
+
+---
+
+## Setup Instructions
+
+### Step 1: Python and PostgreSQL Setup
+
+```bash
+# Clone the repo
+git clone https://github.com/yourusername/gmail-rule-engine.git
+cd gmail-rule-engine
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up PostgreSQL
+# Create a database (you can use psql, PgAdmin, etc.)
+createdb gmail_rule_engine
+```
+---
+
+## Google Cloud Setup
+
+### 🔹 Step 1: Create a Google Cloud Project
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Click the project dropdown → "New Project"
+3. Name it **GmailRuleEngineProject** → Click **Create**
+4. Select the project from the dropdown
+
+### 🔹 Step 2: Enable Gmail API
+
+1. In the dashboard, click “+ ENABLE APIS AND SERVICES”
+2. Search **Gmail API** → Click Enable
+
+### 🔹 Step 3: Configure OAuth Consent Screen
+
+1. Go to **APIs & Services > OAuth consent screen**
+2. Choose **External** → Click **Create**
+3. Fill in the form:
+
+   * App Name: `Gmail Rule Engine`
+   * User support email: your Gmail
+   * Developer contact: your Gmail
+4. Continue until **Test Users**
+5. Add your Gmail address → Click Save
+
+### 🔹 Step 4: Create OAuth Client
+
+1. Go to **Credentials**
+2. Click **Create Credentials** → `OAuth Client ID`
+3. Choose **Desktop App** → Name: `Gmail Rule Engine Client`
+4. Click Create → Download the JSON
+5. Rename it to: `credentials.json`
+6. Move it to: `gmail_rule_engine/config/`
+
+---
+
+## Authenticate User
+
+Run the token generator to generate a token for the Gmail user:
+
+```bash
+python token_generator.py
+```
+
+This will open a browser window for Google Sign-In and save the token under:
+
+```
+gmail_rule_engine/config/tokens/user_email@gmail.com.json
+```
+
+---
+
+## Initialize the Database
+
+```bash
+# Create schema/tables
+python
+>>> from db.schema import init_db
+>>> init_db()
+```
+
+Make sure `.env` contains the correct DB credentials:
+
+```
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=gmail_rule_engine
+DB_USER=your_pg_user
+DB_PASSWORD=your_pg_password
+```
+---
+
+## Fetch Emails
+
+```bash
+python main_fetch.py user_email@gmail.com --days 30
+```
+
+* `--days` (optional): Number of past days to fetch (default: 30)
+* Emails will be saved into PostgreSQL
+
+---
+
+## Define Rules
+
+Edit the `rules/rules.json` file. Example:
+
+```json
+{
+  "predicate": "All",
+  "rules": [
+    {
+      "field": "from",
+      "predicate": "contains",
+      "value": "krithika_k"
+    },
+    {
+      "field": "subject",
+      "predicate": "contains",
+      "value": "invoice"
+    },
+    {
+      "field": "date_received",
+      "predicate": "less_than_days",
+      "value": 3
+    }
+  ],
+  "actions": [
+    "mark_as_read",
+    "move_to_label:CATEGORY_WORK"
+  ]
+}
+```
+
+Supported fields:
+
+* `from`, `to`, `subject`, `message`, `date_received`
+
+Actions:
+
+* `mark_as_read`
+* `mark_as_unread`
+* `move_to_label:<GmailLabel>`
+
+Use only valid Gmail labels like:
+`CATEGORY_PERSONAL`, `CATEGORY_SOCIAL`, `CATEGORY_PROMOTIONS`, `CATEGORY_UPDATES`, `CATEGORY_FORUMS`, `INBOX`, `STARRED`, etc.
+{'chat': 'CHAT', 'sent': 'SENT', 'inbox': 'INBOX', 'important': 'IMPORTANT', 'trash': 'TRASH', 'draft': 'DRAFT', 'spam': 'SPAM', 'category_forums': 'CATEGORY_FORUMS', 'category_updates': 'CATEGORY_UPDATES', 'category_personal': 'CATEGORY_PERSONAL', 'category_promotions': 'CATEGORY_PROMOTIONS', 'category_social': 'CATEGORY_SOCIAL', 'yellow_star': 'YELLOW_STAR', 'starred': 'STARRED', 'unread': 'UNREAD'}  
+---
+
+## Apply Rules
+
+```bash
+python main_apply_rules.py user_email@gmail.com
+```
+
+Applies matching rules on fetched emails and performs defined actions via Gmail API.
+---
+## Tips
+* Email content (`message`) uses the `body` (text content) — not snippet
+* Attachments are handled separately and not stored in body
+* You can implement **soft delete** for better audit/tracking
+* Label fetching is cached per user session
+---
+## Run Tests
+
+```bash
+pytest tests/
+```
+---
