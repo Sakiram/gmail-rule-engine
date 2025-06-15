@@ -192,5 +192,6 @@ Applies matching rules on fetched emails and performs defined actions via Gmail 
 
 ```bash
 pytest tests/
+pytest tests/ --cov=. --cov-report=term # with coverage
 ```
 ---

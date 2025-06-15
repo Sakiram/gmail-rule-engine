@@ -6,7 +6,7 @@ import sys
 
 load_dotenv()
 
-if __name__ == "__main__":
+def main():
     init_db()
 
     if len(sys.argv) < 2:
@@ -25,3 +25,6 @@ if __name__ == "__main__":
             print("Invalid --days argument. Usage: --days <number>")
             exit(1)
     fetch_emails_for_user(email, days=days)
+
+if __name__ == "__main__":
+    main()

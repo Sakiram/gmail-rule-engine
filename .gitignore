@@ -9,6 +9,7 @@ config/tokens/
 *.log
 *.tmp
 logs/*
+*.coverage
 
 # Jupyter
 .ipynb_checkpoints/
