@@ -8,7 +8,7 @@ config/tokens/
 # Logs and temp files
 *.log
 *.tmp
-logs/
+logs/*
 
 # Jupyter
 .ipynb_checkpoints/

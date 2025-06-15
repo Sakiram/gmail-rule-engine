@@ -28,7 +28,7 @@ A Python-based automation engine that fetches emails from Gmail, stores them in 
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourusername/gmail-rule-engine.git
+git clone https://github.com/Sakiram/gmail-rule-engine.git
 cd gmail-rule-engine
 
 # Create virtual environment
