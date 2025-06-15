@@ -14,7 +14,7 @@ def main():
         exit(1)
 
     email = sys.argv[1]
-    days = os.getenv("days")
+    days = int(os.getenv("days"))
 
     # Check if optional --days argument is passed
     if "--days" in sys.argv:

@@ -8,7 +8,7 @@ from gmail.auth import get_gmail_service
 from actions import gmail_actions
 from rules.engine import RuleEngine
 
-# Setup logging
+# logging Setup
 logging.basicConfig(
     filename="logs/rule_application.log",
     level=logging.INFO,
@@ -77,8 +77,6 @@ def main(user_email):
                     print(f"Matched rules for email ID {email.id}")
                     apply_actions(service, user_email, email, actions)
                     logging.info(f"Email ID {email.id} matched rules. Actions applied.")
-                # else:
-                #     print(f"No match for email ID {email.id}")
             except Exception as e:
                 logging.error(f"Error processing email ID {email.id}: {e}")
                 print(f"Error applying rules for email ID {email.id}: {e}")

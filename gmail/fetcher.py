@@ -11,23 +11,34 @@ def fetch_emails_for_user(user_email: str, days: int = 30):
     creds = authenticate_user(user_email)
     service = build('gmail', 'v1', credentials=creds)
 
-     # Compute UNIX timestamp for cutoff date
+    # Compute UNIX timestamp for cutoff date
     cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)    
     cutoff_unix = int(cutoff_date.timestamp())
     query = f"after:{cutoff_unix}"
 
     print(f"Fetching emails back from {days} days for user email: {user_email}...")
 
-    response = service.users().messages().list(
-        userId='me',
-        labelIds=['INBOX'],
-        q=query,
-    ).execute()
+    all_messages = []
+    next_page_token = None
 
-    messages = response.get('messages', [])
-    print(f"Found {len(messages)} messages")
+    while True:
+        response = service.users().messages().list(
+            userId='me',
+            labelIds=['INBOX'],
+            q=query,
+            pageToken=next_page_token
+        ).execute()
 
-    for message in messages:
+        messages = response.get('messages', [])
+        all_messages.extend(messages)
+
+        next_page_token = response.get('nextPageToken')
+        if not next_page_token:
+            break
+
+    print(f"Found {len(all_messages)} messages")
+
+    for message in all_messages:
         msg_detail = service.users().messages().get(
             userId='me',
             id=message['id'],
@@ -35,6 +46,9 @@ def fetch_emails_for_user(user_email: str, days: int = 30):
         ).execute()
 
         email = extract_email_data(msg_detail)
+        if not email:
+            print(f"Skipped message ID {message['id']} - extract_email_data returned None")
+            continue
         save_email(email)
 
     print("Emails fetched and saved.")
