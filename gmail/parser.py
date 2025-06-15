@@ -5,11 +5,6 @@ from db.models import Email
 import re
 
 def extract_email_address(header_value: str) -> str:
-    """
-    Extracts email address from headers like:
-    - "Sakir Ram <sakiramganesan@gmail.com>" => "sakiramganesan@gmail.com"
-    - "sakiramganesan@gmail.com" => "sakiramganesan@gmail.com"
-    """
     match = re.search(r'<(.+?)>', header_value)
     if match:
         return match.group(1).strip()

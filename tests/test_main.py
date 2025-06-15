@@ -256,15 +256,15 @@ class TestGmailParser:
     
     def test_extract_email_address_with_brackets(self):
         """Test email extraction from header with brackets"""
-        header = "Sakir Ram <sakiramganesan@gmail.com>"
+        header = "Sakir Ram <test@gmail.com>"
         result = extract_email_address(header)
-        assert result == "sakiramganesan@gmail.com"
+        assert result == "test@gmail.com"
 
     def test_extract_email_address_without_brackets(self):
         """Test email extraction from plain email"""
-        header = "sakiramganesan@gmail.com"
+        header = "test@gmail.com"
         result = extract_email_address(header)
-        assert result == "sakiramganesan@gmail.com"
+        assert result == "test@gmail.com"
 
     def test_get_header_found(self):
         """Test getting header value when found"""

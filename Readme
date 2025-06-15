@@ -139,12 +139,22 @@ Edit the `rules/rules.json` file. Example:
     {
       "field": "from",
       "predicate": "contains",
-      "value": "krithika_k"
+      "value": "user@gmail.com"
+    },
+    {
+      "field": "to",
+      "predicate": "equals",
+      "value": "test@gmail.com"
     },
     {
       "field": "subject",
       "predicate": "contains",
       "value": "invoice"
+    },
+    {
+      "field": "message",
+      "predicate": "contains",
+      "value": "Hi"
     },
     {
       "field": "date_received",
@@ -162,6 +172,8 @@ Edit the `rules/rules.json` file. Example:
 Supported fields:
 
 * `from`, `to`, `subject`, `message`, `date_received`
+
+* predicates: `contains`, `not_contains`, `equals`, `not_equals`, `less_than_days`, `less_than_months`, `greater_than_days`, `greater_than_months`.
 
 Actions:
 

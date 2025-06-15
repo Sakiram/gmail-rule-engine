@@ -14,8 +14,8 @@ class TestRuleEngine:
             msg_id="msg_123",
             thread_id="thread_123",
             subject="Test Invoice Subject",
-            sender="krithika_k@example.com",
-            recipient="sakiram@example.com",
+            sender="user1@example.com",
+            recipient="test@example.com",
             snippet="Test snippet",
             body="This is a test email body with invoice details",
             date_received=datetime.now(timezone.utc) - timedelta(hours=12),
@@ -39,13 +39,13 @@ class TestRuleEngine:
 
     def test_text_predicate_contains(self):
         """Test contains predicate for text fields"""
-        rules = [{"field": "from", "predicate": "contains", "value": "krithika"}]
+        rules = [{"field": "from", "predicate": "contains", "value": "user1"}]
         engine = RuleEngine("all", rules)
         
         assert engine.match(self.sample_email) == True
         
         # Test case insensitive
-        rules = [{"field": "from", "predicate": "contains", "value": "KRITHIKA"}]
+        rules = [{"field": "from", "predicate": "contains", "value": "USER1"}]
         engine = RuleEngine("all", rules)
         assert engine.match(self.sample_email) == True
 
@@ -56,13 +56,13 @@ class TestRuleEngine:
         
         assert engine.match(self.sample_email) == True
         
-        rules = [{"field": "from", "predicate": "not_contains", "value": "krithika"}]
+        rules = [{"field": "from", "predicate": "not_contains", "value": "user1"}]
         engine = RuleEngine("all", rules)
         assert engine.match(self.sample_email) == False
 
     def test_text_predicate_equals(self):
         """Test equals predicate for text fields"""
-        rules = [{"field": "from", "predicate": "equals", "value": "krithika_k@example.com"}]
+        rules = [{"field": "from", "predicate": "equals", "value": "user1@example.com"}]
         engine = RuleEngine("all", rules)
         
         assert engine.match(self.sample_email) == True
@@ -78,7 +78,7 @@ class TestRuleEngine:
         
         assert engine.match(self.sample_email) == True
         
-        rules = [{"field": "from", "predicate": "not_equals", "value": "krithika_k@example.com"}]
+        rules = [{"field": "from", "predicate": "not_equals", "value": "user1@example.com"}]
         engine = RuleEngine("all", rules)
         assert engine.match(self.sample_email) == False
 
@@ -123,8 +123,8 @@ class TestRuleEngine:
     def test_multiple_rules_all_predicate(self):
         """Test multiple rules with 'all' predicate"""
         rules = [
-            {"field": "from", "predicate": "contains", "value": "krithika"},
-            {"field": "to", "predicate": "contains", "value": "sakiram"},
+            {"field": "from", "predicate": "contains", "value": "user1"},
+            {"field": "to", "predicate": "contains", "value": "test"},
             {"field": "date_received", "predicate": "less_than_days", "value": 1}
         ]
         engine = RuleEngine("all", rules)
@@ -140,7 +140,7 @@ class TestRuleEngine:
     def test_multiple_rules_any_predicate(self):
         """Test multiple rules with 'any' predicate"""
         rules = [
-            {"field": "from", "predicate": "contains", "value": "krithika"},
+            {"field": "from", "predicate": "contains", "value": "user1"},
             {"field": "to", "predicate": "contains", "value": "nonexistent"},
             {"field": "subject", "predicate": "contains", "value": "nonexistent"}
         ]
@@ -161,8 +161,8 @@ class TestRuleEngine:
     def test_field_mapping(self):
         """Test field mapping from rule field names to email attributes"""
         test_cases = [
-            ("from", "sender", "krithika_k@example.com"),
-            ("to", "recipient", "sakiram@example.com"),
+            ("from", "sender", "user1@example.com"),
+            ("to", "recipient", "test@example.com"),
             ("subject", "subject", "Test Invoice Subject"),
             ("message", "body", "This is a test email body with invoice details")
         ]

@@ -4,12 +4,22 @@
     {
       "field": "from",
       "predicate": "contains",
-      "value": "krithika_k"
+      "value": "user@gmail.com"
     },
     {
       "field": "to",
+      "predicate": "equals",
+      "value": "test@gmail.com"
+    },
+    {
+      "field": "subject",
       "predicate": "contains",
-      "value": "sakiram"
+      "value": "invoice"
+    },
+    {
+      "field": "message",
+      "predicate": "contains",
+      "value": "Hi"
     },
     {
       "field": "date_received",

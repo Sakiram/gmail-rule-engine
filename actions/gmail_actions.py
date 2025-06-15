@@ -45,20 +45,6 @@ def mark_as_unread(service, msg_id, user_id, email_record):
 def move_to_label(service, msg_id, user_id, label_name, email_record):
     try:
         label_id = _get_label_id(service, user_id, label_name)
-        # labels = service.users().labels().list(userId=user_id).execute().get('labels', [])
-        # label_dict = {label['name'].lower(): label['id'] for label in labels}
-
-        # label_key = label_name.lower()
-        # print(label_key)
-        # if label_key not in label_dict:
-        #     print(f"Label '{label_name}' is not a valid Gmail label.")
-        #     raise Exception(f"Label '{label_name}' is not a valid Gmail label.")
-
-        # label_id = label_dict[label_key]
-
-        # if not label_id:
-        #     raise Exception(f"Label '{label_name}' not found in Gmail account.")
-
         service.users().messages().modify(
             userId=user_id,
             id=msg_id,
