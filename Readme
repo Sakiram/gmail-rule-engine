@@ -132,41 +132,57 @@ python main_fetch.py user_email@gmail.com --days 30
 
 Edit the `rules/rules.json` file. Example:
 
-```json
-{
-  "predicate": "All",
-  "rules": [
-    {
-      "field": "from",
-      "predicate": "contains",
-      "value": "user@gmail.com"
-    },
-    {
-      "field": "to",
-      "predicate": "equals",
-      "value": "test@gmail.com"
-    },
-    {
-      "field": "subject",
-      "predicate": "contains",
-      "value": "invoice"
-    },
-    {
-      "field": "message",
-      "predicate": "contains",
-      "value": "Hi"
-    },
-    {
-      "field": "date_received",
-      "predicate": "less_than_days",
-      "value": 3
-    }
-  ],
-  "actions": [
-    "mark_as_read",
-    "move_to_label:CATEGORY_WORK"
-  ]
-}
+```json should be a list.
+[
+  {
+    "predicate": "All",
+    "rules": [
+      {
+        "field": "from",
+        "predicate": "contains",
+        "value": "user@gmail.com"
+      },
+      {
+        "field": "to",
+        "predicate": "equals",
+        "value": "test@gmail.com"
+      },
+      {
+        "field": "subject",
+        "predicate": "contains",
+        "value": "invoice"
+      },
+      {
+        "field": "message",
+        "predicate": "contains",
+        "value": "Hi"
+      },
+      {
+        "field": "date_received",
+        "predicate": "less_than_days",
+        "value": 3
+      }
+    ],
+    "actions": [
+      "mark_as_read",
+      "move_to_label:CATEGORY_WORK"
+    ]
+  },
+  {
+    "predicate": "All",
+    "rules": [
+      {
+        "field": "from",
+        "predicate": "contains",
+        "value": "user2@gmail.com"
+      }
+    ],
+    "actions": [
+      "mark_as_read",
+      "move_to_label:CATEGORY_WORK"
+    ]
+  }
+]
 ```
 
 Supported fields:

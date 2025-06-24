@@ -1,34 +1,45 @@
-{
-  "predicate": "all",
-  "rules": [
-    {
-      "field": "from",
-      "predicate": "contains",
-      "value": "user@gmail.com"
-    },
-    {
-      "field": "to",
-      "predicate": "equals",
-      "value": "test@gmail.com"
-    },
-    {
-      "field": "subject",
-      "predicate": "contains",
-      "value": "invoice"
-    },
-    {
-      "field": "message",
-      "predicate": "contains",
-      "value": "Hi"
-    },
-    {
-      "field": "date_received",
-      "predicate": "less_than_days",
-      "value": 1
-    }
-  ],
-  "actions": [
-    "mark_as_read",
-    "move_to_label:CATEGORY_social"
-  ]
-}
+[  
+  {
+    "predicate": "all",
+    "rules": [
+      {
+        "field": "from",
+        "predicate": "contains",
+        "value": "test@gmail.com"
+      },
+      {
+        "field": "subject",
+        "predicate": "contains",
+        "value": "test subject 1"
+      },
+      {
+        "field": "date_received",
+        "predicate": "less_than_days",
+        "value": 1
+      }
+    ],
+    "actions": [
+      "mark_as_unread",
+      "move_to_label:CATEGORY_social"
+    ]
+  },
+  {
+    "predicate": "any",
+    "rules": [
+      {
+        "field": "from",
+        "predicate": "contains",
+        "value": "test1@gmail.com"
+      },
+      {
+        "field": "subject",
+        "predicate": "equals",
+        "value": "test subject"
+      }
+    ],
+    "actions": [
+      "mark_as_unread",
+      "move_to_label:CATEGORY_promotions"
+    ]
+  }
+]

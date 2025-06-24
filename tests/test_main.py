@@ -394,25 +394,29 @@ class TestMainApplyRules:
     @patch('main_apply_rules.os.path.exists')
     @patch('builtins.open', new_callable=mock_open)
     def test_load_rules_success(self, mock_file, mock_exists):
-        """Test successful rule loading"""
+        """Test successful loading of multiple rule sets"""
         mock_exists.return_value = True
-        mock_rules = {
-            "predicate": "all",
-            "rules": [{"field": "from", "predicate": "contains", "value": "test"}],
-            "actions": ["mark_as_read"]
-        }
+        mock_rules = [
+            {
+                "predicate": "all",
+                "rules": [{"field": "from", "predicate": "contains", "value": "test"}],
+                "actions": ["mark_as_read"]
+            },
+            {
+                "predicate": "any",
+                "rules": [{"field": "subject", "predicate": "contains", "value": "invoice"}],
+                "actions": ["move_to_label:Finance"]
+            }
+        ]
         mock_file.return_value.read.return_value = json.dumps(mock_rules)
-        
-        # Import the module to test
+
         import main_apply_rules
-        
-        # Execute
-        overall, rules, actions = main_apply_rules.load_rules()
-        
-        # Verify
-        assert overall == "all"
-        assert len(rules) == 1
-        assert len(actions) == 1
+
+        rule_sets = main_apply_rules.load_rules()
+        assert len(rule_sets) == 2
+        assert rule_sets[0]["predicate"] == "all"
+        assert rule_sets[1]["predicate"] == "any"
+
 
     @patch('main_apply_rules.os.path.exists')
     def test_load_rules_file_not_found(self, mock_exists):
@@ -431,19 +435,36 @@ class TestMainApplyRules:
     def test_load_rules_invalid_predicate(self, mock_file, mock_exists):
         """Test rule loading with invalid predicate"""
         mock_exists.return_value = True
-        mock_rules = {
+        mock_rules = [
+            {
             "predicate": "invalid",
+            "rules": [{"field": "from", "predicate": "contains", "value": "test"}],
+            "actions": ["mark_as_read"]
+            }
+        ]
+        mock_file.return_value.read.return_value = json.dumps(mock_rules)
+
+        import main_apply_rules
+
+        with pytest.raises(ValueError, match="Each rule set must have 'predicate' as 'all' or 'any'"):
+            main_apply_rules.load_rules()
+    
+    @patch('main_apply_rules.os.path.exists')
+    @patch('builtins.open', new_callable=mock_open)
+    def test_load_rules_single_rule_dict(self, mock_file, mock_exists):
+        """Test loading a single rule dict (auto-wrapped into list)"""
+        mock_exists.return_value = True
+        mock_rules = {
+            "predicate": "all",
             "rules": [{"field": "from", "predicate": "contains", "value": "test"}],
             "actions": ["mark_as_read"]
         }
         mock_file.return_value.read.return_value = json.dumps(mock_rules)
-        
-        # Import the module to test
         import main_apply_rules
-        
-        # Execute and verify exception
-        with pytest.raises(ValueError, match="Predicate must be either 'all' or 'any'"):
-            main_apply_rules.load_rules()
+        rule_sets = main_apply_rules.load_rules()
+        assert isinstance(rule_sets, list)
+        assert len(rule_sets) == 1
+        assert rule_sets[0]["predicate"] == "all"
 
     @patch('main_apply_rules.gmail_actions.mark_as_read')
     def test_apply_actions_mark_as_read(self, mock_mark_read):
@@ -478,21 +499,6 @@ class TestMainApplyRules:
         
         # Verify
         mock_move.assert_called_once_with(mock_service, "msg_123", "test@example.com", "INBOX", mock_email)
-
-    # def test_apply_actions_unsupported_action_with_caplog(self, caplog):
-    #     """Test that unsupported actions are logged"""
-    #     import main_apply_rules
-        
-    #     mock_service = Mock()
-    #     mock_email = Mock()
-    #     mock_email.id = 1
-        
-    #     with caplog.at_level(logging.ERROR):
-    #         main_apply_rules.apply_actions(mock_service, "test@example.com", mock_email, ["invalid_action"])
-        
-    #     # Check that error was logged
-    #     assert len(caplog.records) > 0
-    #     assert any("Unsupported action" in record.message for record in caplog.records)
 
 class TestMainFetch:
     """Test cases for main_fetch module"""

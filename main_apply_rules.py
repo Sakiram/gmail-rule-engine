@@ -24,19 +24,26 @@ def load_rules():
 
     with open(RULES_FILE, "r") as file:
         data = json.load(file)
+    
+    if isinstance(data, dict):
+        data = [data]
 
-    overall = data.get("predicate", "").lower()
-    rules = data.get("rules", [])
-    actions = data.get("actions", [])
+    if not isinstance(data, list):
+        raise ValueError("rules.json must contain a list of rule sets.")
 
-    if overall not in ["all", "any"]:
-        raise ValueError("Predicate must be either 'all' or 'any'.")
-    if not rules:
-        raise ValueError("At least one rule must be defined.")
-    if not actions:
-        raise ValueError("At least one action must be defined.")
-    print(f"Loaded rules: {rules}")
-    return overall, rules, actions
+    for rule_set in data:
+        overall = rule_set.get("predicate", "").lower()
+        rules = rule_set.get("rules", [])
+        actions = rule_set.get("actions", [])
+        if overall not in ["all", "any"]:
+            raise ValueError("Each rule set must have 'predicate' as 'all' or 'any'")
+        if not rules:
+            raise ValueError("Each rule set must include at least one rule.")
+        if not actions:
+            raise ValueError("Each rule set must include at least one action.")
+        print(f"Loaded rules: {rules}")
+
+    return data
 
 def apply_actions(service, user_id, email_record: Email, actions):
     """Apply configured actions to matched email."""
@@ -66,20 +73,20 @@ def apply_actions(service, user_id, email_record: Email, actions):
 def main(user_email):
     """Main entry point to evaluate and apply rules."""
     try:
-        overall, rules, actions = load_rules()
-        engine = RuleEngine(overall, rules)
+        rule_sets = load_rules()
         emails = get_all_emails()
         service = get_gmail_service(user_email)
 
         for email in emails:
-            try:
-                if engine.match(email):
-                    print(f"Matched rules for email ID {email.id}")
-                    apply_actions(service, user_email, email, actions)
-                    logging.info(f"Email ID {email.id} matched rules. Actions applied.")
-            except Exception as e:
-                logging.error(f"Error processing email ID {email.id}: {e}")
-                print(f"Error applying rules for email ID {email.id}: {e}")
+            for rule_set in rule_sets:
+                try:
+                    engine = RuleEngine(rule_set["predicate"], rule_set["rules"])
+                    if engine.match(email):
+                        print(f"Matched rule set for email ID {email.id}")
+                        apply_actions(service, user_email, email, rule_set["actions"])
+                except Exception as e:
+                    logging.error(f"Error applying rule set to email ID {email.id}: {e}")
+                    print(f"Error applying rules for email ID {email.id}: {e}")
 
     except Exception as e:
         logging.critical(f"Critical failure: {e}")
